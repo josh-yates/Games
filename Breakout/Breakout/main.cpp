@@ -5,7 +5,12 @@
 #include <stdexcept>
 #include <string>
 
+//Global variables
 HWND hGameWindow;
+int GameWindowWidth{ 700 };
+int GameWindowHeight{ 500 };
+int GameWindowXPos{ 100 };
+int GameWindowYPos{ 100 };
 LRESULT __stdcall GameWindowProc(HWND hWindow, UINT Message, WPARAM wP, LPARAM lP);
 
 int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdshow) {
@@ -22,9 +27,13 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 			throw std::invalid_argument("Failed to register GameWindowClass");
 		}
 
+		RECT GameWindowClientRect = { 0, 0, GameWindowWidth, GameWindowHeight };
+		AdjustWindowRect(&GameWindowClientRect, WS_SYSMENU | WS_VISIBLE, NULL);
+
 		//Show game window
 		hGameWindow = CreateWindowW(L"GameWindowClass", L"Breakout", WS_SYSMENU | WS_VISIBLE,
-			100, 100, 300, 300, NULL, NULL, NULL, NULL);
+			GameWindowXPos, GameWindowYPos, GameWindowClientRect.right - GameWindowClientRect.left,
+			GameWindowClientRect.bottom - GameWindowClientRect.top, NULL, NULL, NULL, NULL);
 
 		//Message Loop
 		MSG Message{ 0 };

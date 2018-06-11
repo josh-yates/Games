@@ -1,11 +1,19 @@
 //BREAKOUT GAME PROGRAMMING PROJECT USING DIRECT2D
+//Uses "What's a creel?" video tutorial on direct2d graphics
 
 #include <Windows.h>
-#include <d2d1_1.h>
+#include <d2d1.h>
 #include <stdexcept>
 #include <string>
 
-//Global variables
+#include "GameGraphics.h"
+
+//GLOBAL VARIABLES
+//Graphics engine
+GraphicsEngine* GameEngine;
+RECT UpdatedRect;
+
+//Game Window
 HWND hGameWindow;
 int GameWindowWidth{ 700 };
 int GameWindowHeight{ 500 };
@@ -35,12 +43,22 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 			GameWindowXPos, GameWindowYPos, GameWindowClientRect.right - GameWindowClientRect.left,
 			GameWindowClientRect.bottom - GameWindowClientRect.top, NULL, NULL, NULL, NULL);
 
+		//Initialise graphics engine
+		GameEngine = new GraphicsEngine();
+		if (!GameEngine->Init(hGameWindow)) {
+			delete GameEngine;
+			throw std::invalid_argument("Unable to initialise graphics");
+		}
+
 		//Message Loop
 		MSG Message{ 0 };
 		while (GetMessage(&Message, NULL, NULL, NULL)) {
 			TranslateMessage(&Message);
 			DispatchMessage(&Message);
 		}
+
+		//Clean up memory
+		delete GameEngine;
 	}
 	catch (std::invalid_argument& inval_arg) {
 		//copy string to wstring
@@ -60,6 +78,17 @@ LRESULT __stdcall GameWindowProc(HWND hWindow, UINT Message, WPARAM wP, LPARAM l
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
+		break;
+	case WM_PAINT:
+		GameEngine->BeginDraw();
+		GameEngine->ClearScreen(0, 0, 0.5);
+		//create 1000 random circles
+		for (int i{ 0 }; i < 10; i++) {
+			GameEngine->DrawCircle(rand() % GameWindowWidth, rand() % GameWindowHeight, rand() % 100, (rand() % 100) / 100.0, (rand() % 100) / 100.0, (rand() % 100) / 100.0, (rand() % 100) / 100.0);
+		}
+		GameEngine->EndDraw();
+		GetClientRect(hGameWindow, &UpdatedRect);
+		ValidateRect(hGameWindow, &UpdatedRect);
 		break;
 	default:
 		return DefWindowProcW(hWindow, Message, wP, lP);

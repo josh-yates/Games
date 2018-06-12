@@ -8,6 +8,7 @@ class GraphicsEngine {
 private:
 	ID2D1Factory * Factory;					//Generates resources
 	ID2D1HwndRenderTarget* RenderTarget;	//Where to render resources to
+	ID2D1SolidColorBrush* Brush;		//Brush for drawing shapes
 public:
 	GraphicsEngine();
 	~GraphicsEngine();

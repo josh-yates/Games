@@ -49,5 +49,6 @@ void GraphicsEngine::DrawCircle(double X, double Y, double Radius, double R, dou
 	ID2D1SolidColorBrush* CircleBrush;
 	RenderTarget->CreateSolidColorBrush(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)), &CircleBrush);
 	RenderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(Radius), static_cast<float>(Radius)), CircleBrush, 3);
+	RenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(Radius), static_cast<float>(Radius)), CircleBrush);
 	CircleBrush->Release();
 }

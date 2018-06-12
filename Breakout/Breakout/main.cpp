@@ -81,9 +81,9 @@ LRESULT __stdcall GameWindowProc(HWND hWindow, UINT Message, WPARAM wP, LPARAM l
 		break;
 	case WM_PAINT:
 		GameEngine->BeginDraw();
-		GameEngine->ClearScreen(0, 0, 0.5);
+		GameEngine->ClearScreen(0.5, 0.5, 0.5);
 		//create 1000 random circles
-		for (int i{ 0 }; i < 10; i++) {
+		for (int i{ 0 }; i < 50; i++) {
 			GameEngine->DrawCircle(rand() % GameWindowWidth, rand() % GameWindowHeight, rand() % 100, (rand() % 100) / 100.0, (rand() % 100) / 100.0, (rand() % 100) / 100.0, (rand() % 100) / 100.0);
 		}
 		GameEngine->EndDraw();

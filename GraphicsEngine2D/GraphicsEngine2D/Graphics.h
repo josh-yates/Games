@@ -1,5 +1,5 @@
-#ifndef GAMEGRAPHICS_H
-#define GAMEGRAPHICS_H
+#ifndef GRAPHICS_H
+#define GRAPHICS_H
 
 #include <Windows.h>
 #include <d2d1.h>

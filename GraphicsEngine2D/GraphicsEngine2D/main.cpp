@@ -7,16 +7,21 @@
 #include <string>
 
 #include "Graphics.h"
+#include "Physics.h"
 
 //GLOBAL VARIABLES
 //Graphics engine
 GraphicsEngine* Graphics;
+PhysicsEngine* Physics;
 RECT UpdatedRect;
 
-//Ball variables
-double ballYPos{ 0.0 };
-double ballYSpeed{ 0.0 };
-double ballRadius{ 25.0 };
+//Physics engine test
+Vector2D Gravity(0, 9.81);
+Vector2D StartVelocity(-40, -10);
+Ball MyFirstBall(10, 200, 100, 20, StartVelocity);
+std::vector<Ball> Balls;
+std::vector<std::vector<double>> BallPath;
+int PathCount{ 1 };
 
 //Game Window
 HWND hGameWindow;
@@ -55,6 +60,10 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 			throw std::invalid_argument("Unable to initialise graphics");
 		}
 
+		//Initialise physics engine and add test balls
+		Physics = new PhysicsEngine(GameClientWidth, 0, GameClientHeight, 0, Gravity);
+		Physics->AddObject(&MyFirstBall);
+
 		//Message Loop
 		MSG Message{ 0 };
 		while (Message.message!=WM_QUIT) {
@@ -64,15 +73,20 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 			}
 			else {
 				//Update and render
-				ballYSpeed += 0.1;									//TODO Continue this in separate game physics engine
-				ballYPos += ballYSpeed;
-				if (ballYPos > GameClientHeight - ballRadius) {
-					ballYPos = GameClientHeight - ballRadius;
-					ballYSpeed = -5.0;
-				}
+				Physics->Update(0.15);
 				Graphics->BeginDraw();
 				Graphics->ClearScreen(0.0, 0.3, 0.7);
-				Graphics->DrawCircle(100, ballYPos, ballRadius, 1.0, 0.0, 1.0, 1.0);
+				if (PathCount == 6) {
+					BallPath.push_back({ MyFirstBall.getXPos(), MyFirstBall.getYPos() });
+					PathCount = 1;
+				}
+				else {
+					PathCount += 1;
+				}
+				for (auto iter{ BallPath.begin() }; iter != BallPath.end(); iter++) {
+					Graphics->DrawCircle(iter->at(0), iter->at(1), 5, 1.0, 0.0, 0.0, 0.8);
+				}
+				Graphics->DrawCircle(MyFirstBall.getXPos(), MyFirstBall.getYPos(), MyFirstBall.getRadius(), 0.5, 0.8, 0.2, 1.0);
 				Graphics->EndDraw();
 			}
 		}
@@ -84,6 +98,7 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 
 		//Clean up memory
 		delete Graphics;
+		delete Physics;
 
 	}
 	catch (std::invalid_argument& inval_arg) {

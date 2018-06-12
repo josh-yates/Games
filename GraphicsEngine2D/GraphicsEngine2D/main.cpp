@@ -17,11 +17,7 @@ RECT UpdatedRect;
 
 //Physics engine test
 Vector2D Gravity(0, 9.81);
-Vector2D StartVelocity(-40, -10);
-Ball MyFirstBall(10, 200, 100, 20, StartVelocity);
 std::vector<Ball> Balls;
-std::vector<std::vector<double>> BallPath;
-int PathCount{ 1 };
 
 //Game Window
 HWND hGameWindow;
@@ -62,7 +58,14 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 
 		//Initialise physics engine and add test balls
 		Physics = new PhysicsEngine(GameClientWidth, 0, GameClientHeight, 0, Gravity);
-		Physics->AddObject(&MyFirstBall);
+		for (int i{ 0 }; i < 20; i++) {
+			Vector2D tempVelocity(rand() % 71 + (-35), rand() % 51 + (-25));
+			Ball tempBall(1, rand() % GameClientWidth, rand() % GameClientHeight, rand() % 20, tempVelocity);
+			Balls.push_back(tempBall);
+		}
+		for (auto iter{ Balls.begin() }; iter != Balls.end(); iter++) {
+			Physics->AddObject(&*iter);
+		}
 
 		//Message Loop
 		MSG Message{ 0 };
@@ -76,26 +79,12 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 				Physics->Update(0.15);
 				Graphics->BeginDraw();
 				Graphics->ClearScreen(0.0, 0.3, 0.7);
-				if (PathCount == 6) {
-					BallPath.push_back({ MyFirstBall.getXPos(), MyFirstBall.getYPos() });
-					PathCount = 1;
+				for (auto iter{ Balls.begin() }; iter != Balls.end(); iter++) {
+					Graphics->DrawCircle(iter->getXPos(), iter->getYPos(), iter->getRadius(), 1.0, 0.0, 0.0, 0.6);
 				}
-				else {
-					PathCount += 1;
-				}
-				for (auto iter{ BallPath.begin() }; iter != BallPath.end(); iter++) {
-					Graphics->DrawCircle(iter->at(0), iter->at(1), 5, 1.0, 0.0, 0.0, 0.8);
-				}
-				Graphics->DrawCircle(MyFirstBall.getXPos(), MyFirstBall.getYPos(), MyFirstBall.getRadius(), 0.5, 0.8, 0.2, 1.0);
 				Graphics->EndDraw();
 			}
 		}
-
-		//while (GetMessage(&Message, NULL, NULL, NULL)) {		//Original message loop
-		//	TranslateMessage(&Message);
-		//	DispatchMessage(&Message);
-		//}
-
 		//Clean up memory
 		delete Graphics;
 		delete Physics;
@@ -120,17 +109,6 @@ LRESULT __stdcall GameWindowProc(HWND hWindow, UINT Message, WPARAM wP, LPARAM l
 		PostQuitMessage(0);
 		return 0;
 		break;
-	//case WM_PAINT:
-	//	Graphics->BeginDraw();
-	//	Graphics->ClearScreen(1, 1, 1);
-	//	//create 50 random circles
-	//	for (int i{ 0 }; i < 50; i++) {
-	//		Graphics->DrawCircle(rand() % GameWindowWidth, rand() % GameWindowHeight, rand() % 100, (rand() % 100) / 100.0, (rand() % 100) / 100.0, (rand() % 100) / 100.0, (rand() % 100) / 100.0);
-	//	}
-	//	Graphics->EndDraw();
-	//	GetClientRect(hGameWindow, &UpdatedRect);
-	//	ValidateRect(hGameWindow, &UpdatedRect);
-	//	break;
 	default:
 		return DefWindowProcW(hWindow, Message, wP, lP);
 		break;

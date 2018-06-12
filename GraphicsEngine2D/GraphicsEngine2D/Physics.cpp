@@ -142,10 +142,11 @@ void PhysicsEngine::CheckBoundaries(PhysicsObject& objectIn) {
 void PhysicsEngine::Update(const double TimeChange) {
 	for (auto iter{ WorldObjects.begin() }; iter != WorldObjects.end(); iter++) {
 		CheckBoundaries(**iter);
-		//calculate new velocity and position
-		(*iter)->setXPos(((*iter)->getVelocity().getXVec()*TimeChange) + (*iter)->getXPos());
-		(*iter)->setYPos(((*iter)->getVelocity().getYVec()*TimeChange) + (*iter)->getYPos());
+		//calculate average velocity and use that to calculate position
 		Vector2D newVelocity{ (Gravity*TimeChange) + (*iter)->getVelocity() };
+		Vector2D averageVelocity{ (newVelocity + (*iter)->getVelocity())*0.5 };
+		(*iter)->setXPos((averageVelocity.getXVec()*TimeChange) + (*iter)->getXPos());
+		(*iter)->setYPos((averageVelocity.getYVec()*TimeChange) + (*iter)->getYPos());
 		(*iter)->setVelocity(newVelocity);
 	}
 }

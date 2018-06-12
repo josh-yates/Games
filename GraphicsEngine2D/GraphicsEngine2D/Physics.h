@@ -69,6 +69,7 @@ public:
 
 class PhysicsEngine {
 private:
+	bool EulerCromer; //tracks whether to use euler cromer or euler -> preserve energy
 	std::vector<PhysicsObject*> WorldObjects;
 	Vector2D Gravity;
 	ObjectEdges WorldEdges;										//define the boundaries of the world (screen)

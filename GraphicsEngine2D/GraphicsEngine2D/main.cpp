@@ -18,10 +18,11 @@ RECT UpdatedRect;
 //Physics engine test
 Vector2D Gravity(0, 9.81);
 std::vector<Ball> Balls;
+std::vector<std::vector<double>> BallColours;
 
 //Game Window
 HWND hGameWindow;
-int GameClientWidth{ 700 };
+int GameClientWidth{ 1000 };
 int GameClientHeight{ 700 };
 int GameWindowXPos{ 100 };
 int GameWindowYPos{ 100 };
@@ -58,10 +59,11 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 
 		//Initialise physics engine and add test balls
 		Physics = new PhysicsEngine(GameClientWidth, 0, GameClientHeight, 0, Gravity);
-		for (int i{ 0 }; i < 20; i++) {
+		for (int i{ 0 }; i < 50; i++) {
 			Vector2D tempVelocity(rand() % 71 + (-35), rand() % 51 + (-25));
-			Ball tempBall(1, rand() % GameClientWidth, rand() % GameClientHeight, rand() % 20, tempVelocity);
+			Ball tempBall(1, rand() % GameClientWidth, rand() % GameClientHeight, (rand() % 20) + 5, tempVelocity);
 			Balls.push_back(tempBall);
+			BallColours.push_back({ (rand() % 100) / 100.0,(rand() % 100) / 100.0 ,(rand() % 100) / 100.0 ,(rand() % 100) / 100.0 });
 		}
 		for (auto iter{ Balls.begin() }; iter != Balls.end(); iter++) {
 			Physics->AddObject(&*iter);
@@ -76,11 +78,11 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 			}
 			else {
 				//Update and render
-				Physics->Update(0.15);
+				Physics->Update(1);
 				Graphics->BeginDraw();
 				Graphics->ClearScreen(0.0, 0.3, 0.7);
-				for (auto iter{ Balls.begin() }; iter != Balls.end(); iter++) {
-					Graphics->DrawCircle(iter->getXPos(), iter->getYPos(), iter->getRadius(), 1.0, 0.0, 0.0, 0.6);
+				for (size_t i{ 0 }; i < Balls.size(); i++) {
+					Graphics->DrawCircle(Balls[i].getXPos(), Balls[i].getYPos(), Balls[i].getRadius(), BallColours[i].at(0), BallColours[i].at(1), BallColours[i].at(2), BallColours[i].at(3));
 				}
 				Graphics->EndDraw();
 			}

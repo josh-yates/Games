@@ -95,6 +95,7 @@ PhysicsEngine::PhysicsEngine(const double UpperXEdge, const double LowerXEdge, c
 		tempEdges.UpperY = LowerYEdge;
 	}
 	WorldEdges = tempEdges;
+	EulerCromer = true;
 }
 PhysicsEngine::~PhysicsEngine() {}
 ObjectEdges PhysicsEngine::getWorldedges()const {
@@ -142,11 +143,20 @@ void PhysicsEngine::CheckBoundaries(PhysicsObject& objectIn) {
 void PhysicsEngine::Update(const double TimeChange) {
 	for (auto iter{ WorldObjects.begin() }; iter != WorldObjects.end(); iter++) {
 		CheckBoundaries(**iter);
-		//calculate average velocity and use that to calculate position
+		//calculate new velocity
 		Vector2D newVelocity{ (Gravity*TimeChange) + (*iter)->getVelocity() };
-		Vector2D averageVelocity{ (newVelocity + (*iter)->getVelocity())*0.5 };
-		(*iter)->setXPos((averageVelocity.getXVec()*TimeChange) + (*iter)->getXPos());
-		(*iter)->setYPos((averageVelocity.getYVec()*TimeChange) + (*iter)->getYPos());
+		if (EulerCromer) {
+			//use euler cromer
+			(*iter)->setXPos((newVelocity.getXVec()*TimeChange) + (*iter)->getXPos());
+			(*iter)->setYPos((newVelocity.getYVec()*TimeChange) + (*iter)->getYPos());
+			EulerCromer = false;
+		}
+		else {
+			//use euler
+			(*iter)->setXPos(((*iter)->getVelocity().getXVec()*TimeChange) + (*iter)->getXPos());
+			(*iter)->setYPos(((*iter)->getVelocity().getYVec()*TimeChange) + (*iter)->getYPos());
+			EulerCromer = true;
+		}
 		(*iter)->setVelocity(newVelocity);
 	}
 }

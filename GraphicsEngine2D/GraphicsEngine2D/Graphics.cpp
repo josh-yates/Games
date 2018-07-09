@@ -57,8 +57,43 @@ void GraphicsEngine::EndDraw() {
 void GraphicsEngine::ClearScreen(double R, double G, double B) {
 	RenderTarget->Clear(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B)));
 }
-void GraphicsEngine::DrawCircle(double X, double Y, double Radius, double R, double G, double B, double A) {
+
+void GraphicsEngine::DrawEmptyCircle(double X, double Y, double Radius, double R, double G, double B, double A, double Thickness) {
 	Brush->SetColor(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)));
-	//RenderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(Radius), static_cast<float>(Radius)), Brush, 3);
+	RenderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(Radius), static_cast<float>(Radius)), Brush, static_cast<float>(abs(Thickness)));
+}
+
+void GraphicsEngine::DrawFullCircle(double X, double Y, double Radius, double R, double G, double B, double A) {
+	Brush->SetColor(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)));
 	RenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(Radius), static_cast<float>(Radius)), Brush);
+}
+
+void GraphicsEngine::DrawEmptyEllipse(double X, double Y, double RadiusA, double RadiusB, double R, double G, double B, double A, double Thickness) {
+	Brush->SetColor(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)));
+	RenderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(RadiusA), static_cast<float>(RadiusB)), Brush, static_cast<float>(abs(Thickness)));
+}
+
+void GraphicsEngine::DrawFullEllipse(double X, double Y, double RadiusA, double RadiusB, double R, double G, double B, double A) {
+	Brush->SetColor(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)));
+	RenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(RadiusA), static_cast<float>(RadiusB)), Brush);
+}
+
+void GraphicsEngine::DrawEmptyRectangle(double X, double Y, double Width, double Height, double R, double G, double B, double A, double Thickness) {
+	Brush->SetColor(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)));
+	RenderTarget->DrawRectangle(D2D1::Rect(X, Y, X + Width, Y + Width), Brush, Thickness);
+}
+
+void GraphicsEngine::DrawFullRectangle(double X, double Y, double Width, double Height, double R, double G, double B, double A) {
+	Brush->SetColor(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)));
+	RenderTarget->FillRectangle(D2D1::Rect(X, Y, X + Width, Y + Width), Brush);
+}
+
+void GraphicsEngine::DrawEmptySquare(double X, double Y, double SideLength, double R, double G, double B, double A, double Thickness) {
+	Brush->SetColor(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)));
+	RenderTarget->DrawRectangle(D2D1::Rect(X, Y, X + SideLength, Y + SideLength), Brush, Thickness);
+}
+
+void GraphicsEngine::DrawFullSquare(double X, double Y, double SideLength, double R, double G, double B, double A) {
+	Brush->SetColor(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)));
+	RenderTarget->FillRectangle(D2D1::Rect(X, Y, X + SideLength, Y + SideLength), Brush);
 }

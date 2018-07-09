@@ -59,7 +59,7 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 
 		//Initialise physics engine and add test balls
 		Physics = new PhysicsEngine(GameClientWidth, 0, GameClientHeight, 0, Gravity);
-		for (int i{ 0 }; i < 50; i++) {
+		for (int i{ 0 }; i < 100; i++) {
 			Vector2D tempVelocity(rand() % 71 + (-35), rand() % 51 + (-25));
 			Ball tempBall(1, rand() % GameClientWidth, rand() % GameClientHeight, (rand() % 20) + 5, tempVelocity);
 			Balls.push_back(tempBall);
@@ -78,11 +78,11 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 			}
 			else {
 				//Update and render
-				Physics->Update(1);
+				Physics->Update(0.15);
 				Graphics->BeginDraw();
 				Graphics->ClearScreen(0.0, 0.3, 0.7);
 				for (size_t i{ 0 }; i < Balls.size(); i++) {
-					Graphics->DrawCircle(Balls[i].getXPos(), Balls[i].getYPos(), Balls[i].getRadius(), BallColours[i].at(0), BallColours[i].at(1), BallColours[i].at(2), BallColours[i].at(3));
+					Graphics->DrawEmptyCircle(Balls[i].getXPos(), Balls[i].getYPos(), Balls[i].getRadius(), BallColours[i].at(0), BallColours[i].at(1), BallColours[i].at(2), BallColours[i].at(3),5);
 				}
 				Graphics->EndDraw();
 			}

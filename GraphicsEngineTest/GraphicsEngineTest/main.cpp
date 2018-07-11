@@ -69,6 +69,9 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 				Graphics->DrawFullSquare(550, 30, 40, 0.8, 0.7, 0.3, 1.0);
 				Graphics->DrawEmptyRectangle(650, 30, 50, 20, 0.3, 0.3, 0.5, 1.0, 3);
 				Graphics->DrawFullRectangle(750, 30, 100, 50, 0.9, 0.2, 0.2, 1.0);
+				Graphics->DrawEmptyRectangle(10, 100, 70, 30, 1.0, 0.0, 0.0, 1.0, 3);
+				Graphics->WriteText("My text", "Impact", -30, 10, 100, 70, 30, 1.0, 0.1, 1.0, 0.5);
+				Graphics->WriteText("My other text", "Comic Sans MS", 40, 200, 100, 100, 100, 0.8, 0.8, 1.0, 1.0);
 				Graphics->EndDraw();
 			}
 		}

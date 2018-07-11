@@ -2,14 +2,20 @@
 #define GRAPHICS_H
 
 #include <Windows.h>
+#include <stdexcept>
 #include <d2d1.h>
+#include <dwrite.h>
 #include <string>
 
 class GraphicsEngine {
 private:
-	ID2D1Factory * Factory;					//Generates resources
+	ID2D1Factory * Factory;					//Generates graphics resources
+	IDWriteFactory* TextFactory;			//Generates text resources
 	ID2D1HwndRenderTarget* RenderTarget;	//Where to render resources to
-	ID2D1SolidColorBrush* Brush;		//Brush for drawing shapes
+	ID2D1SolidColorBrush* Brush;			//Brush for drawing shapes
+	IDWriteTextFormat* TextFormat;			//Formatter for text
+	HRESULT EventResult;
+	std::wstring StringToWstring(const std::string StringIn);	//String to wstring converter
 public:
 	GraphicsEngine();
 	~GraphicsEngine();
@@ -25,7 +31,7 @@ public:
 	void DrawFullRectangle(double X, double Y, double Width, double Height, double R, double G, double B, double A);
 	void DrawEmptySquare(double X, double Y, double SideLength, double R, double G, double B, double A, double Thickness);
 	void DrawFullSquare(double X, double Y, double SideLength, double R, double G, double B, double A);
-	//TODO add extra functions for ellipse, square etc and finish them. Rename drawcircle to DrawEmptyCircle etc to avoid conflicts
+	void WriteText(std::string TextIn, std::string FontName, double FontSize, double X, double Y, double Width, double Height, double R, double G, double B, double A);
 };
 
 #endif

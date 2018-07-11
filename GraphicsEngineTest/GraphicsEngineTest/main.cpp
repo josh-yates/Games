@@ -10,7 +10,7 @@
 
 //GLOBAL VARIABLES
 //Graphics engine
-GraphicsEngine* Graphics;
+Graphics::GraphicsEngine* Renderer;
 RECT UpdatedRect;
 
 //Window Values
@@ -44,9 +44,9 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 			MainWindowRect.bottom - MainWindowRect.top, NULL, NULL, NULL, NULL);
 
 		//Initialise graphics engine
-		Graphics = new GraphicsEngine();
-		if (!Graphics->Init(hMainWindow)) {
-			delete Graphics;
+		Renderer = new Graphics::GraphicsEngine();
+		if (!Renderer->Init(hMainWindow)) {
+			delete Renderer;
 			throw std::invalid_argument("Unable to initialise graphics");
 		}
 
@@ -59,24 +59,22 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 			}
 			else {
 				//Update and render
-				Graphics->BeginDraw();
-				Graphics->ClearScreen(0.1, 0.1, 0.1);
-				Graphics->DrawEmptyCircle(50, 50, 20, 0.0, 0.6, 0.6, 1.0, 4);
-				Graphics->DrawFullCircle(150, 50, 20, 0.3, 0.2, 0.7, 1.0);
-				Graphics->DrawEmptyEllipse(250, 50, 40, 20, 0.5, 0.2, 0.5, 1.0, 2);
-				Graphics->DrawFullEllipse(350, 50, 50, 20, 0.9, 0.9, 0.2, 1.0);
-				Graphics->DrawEmptySquare(450, 30, 40, 0.4, 0.3, 0.2, 1.0, 5);
-				Graphics->DrawFullSquare(550, 30, 40, 0.8, 0.7, 0.3, 1.0);
-				Graphics->DrawEmptyRectangle(650, 30, 50, 20, 0.3, 0.3, 0.5, 1.0, 3);
-				Graphics->DrawFullRectangle(750, 30, 100, 50, 0.9, 0.2, 0.2, 1.0);
-				Graphics->DrawEmptyRectangle(10, 100, 70, 30, 1.0, 0.0, 0.0, 1.0, 3);
-				Graphics->WriteText("My text", "Impact", -30, 10, 100, 70, 30, 1.0, 0.1, 1.0, 0.5);
-				Graphics->WriteText("My other text", "Comic Sans MS", 40, 200, 100, 100, 100, 0.8, 0.8, 1.0, 1.0);
-				Graphics->EndDraw();
+				Renderer->BeginDraw();
+				Renderer->ClearScreen(0.1, 0.2, 0.1);
+				Renderer->DrawEmptyCircle(50, 50, 20, 0.0, 0.6, 0.6, 1.0, 4);
+				Renderer->DrawFullCircle(150, 50, 20, 0.3, 0.2, 0.7, 1.0);
+				Renderer->DrawEmptyEllipse(250, 50, 40, 20, 0.5, 0.2, 0.5, 1.0, 2);
+				Renderer->DrawFullEllipse(350, 50, 50, 20, 0.9, 0.9, 0.2, 1.0);
+				Renderer->DrawEmptySquare(450, 30, 40, 0.4, 0.3, 0.2, 1.0, 5);
+				Renderer->DrawFullSquare(550, 30, 40, 0.8, 0.7, 0.3, 1.0);
+				Renderer->DrawEmptyRectangle(650, 30, 50, 20, 0.3, 0.3, 0.5, 1.0, 3);
+				Renderer->DrawFullRectangle(750, 30, 100, 50, 0.9, 0.2, 0.2, 1.0);
+				Renderer->WriteText("abcdefghijklmnopqrstuvwxyz0123456789#'/.,\@:;(){}[]", "comic sans ms", -30, 10, 100, 800, 300, 1.0, 0.1, 1.0, 0.5);
+				Renderer->EndDraw();
 			}
 		}
 		//Clean up memory
-		delete Graphics;
+		delete Renderer;
 
 	}
 	catch (std::invalid_argument& inval_arg) {

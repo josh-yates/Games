@@ -3,11 +3,23 @@
 
 #include <Windows.h>
 #include <stdexcept>
+#include <vector>
 #include <d2d1.h>
 #include <dwrite.h>
 #include <string>
 
+//LINEAR OR SOLID: Make separate "SetSolidBrush" and "SetLinearBrush" functions that can then be used to edit brushes
+//Also use flags at function input specifying whether to use linear or solid brush - could use enum or #define's
+
 namespace Graphics {
+	struct Colour {
+		Colour(const double Rin, const double Gin, const double Bin, const double Ain);
+		double R;
+		double G;
+		double B;
+		double A;
+	};
+
 	class GraphicsEngine {
 	private:
 		ID2D1Factory * Factory;					//Generates graphics resources
@@ -15,15 +27,20 @@ namespace Graphics {
 		ID2D1HwndRenderTarget* RenderTarget;	//Where to render resources to
 		ID2D1SolidColorBrush* SolidBrush;		//Brush for drawing shapes with solid color
 		ID2D1LinearGradientBrush* LinearBrush;	//Brush for drawing shapes with gradient color
+		D2D1_GRADIENT_STOP* GradientStopsArray;	//Pointer for dynamic allocation of gradient stop array
+		ID2D1GradientStopCollection* GradientStopCollection;
 		IDWriteTextFormat* TextFormat;			//Formatter for text
 		HRESULT EventResult;
 		std::wstring StringToWstring(const std::string StringIn);	//String to wstring converter
 	public:
+		//TODO const all those inputs... :) (or change them all to take a Graphics::Colour
 		GraphicsEngine();
 		~GraphicsEngine();
 		bool Init(HWND hWindow);				//Initialise direct2d
 		void BeginDraw();						//Signal start of graphics drawing
 		void EndDraw();							//Signal end of graphics drawing
+		void SetSolidBrush(double R, double G, double B, double A);
+		void SetLinearBrush(const std::vector<Graphics::Colour> GradientStops, const double StartX, const double StartY, const double EndX, const double EndY);
 		void ClearScreen(double R, double G, double B);
 		void DrawEmptyCircle(double X, double Y, double Radius, double R, double G, double B, double A, double Thickness);
 		void DrawFullCircle(double X, double Y, double Radius, double R, double G, double B, double A);

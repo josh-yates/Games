@@ -1,14 +1,17 @@
 #include "Graphics.h"
 
 namespace Graphics {
+	Colour::Colour(const double Rin, const double Gin, const double Bin, const double Ain) :R(Rin), G(Gin), B(Bin), A(Ain) {}
 
 	GraphicsEngine::GraphicsEngine() {
-		Factory = NULL;
-		TextFactory = NULL;
-		RenderTarget = NULL;
-		SolidBrush = NULL;
-		LinearBrush = NULL;
-		TextFormat = NULL;
+		Factory = nullptr;
+		TextFactory = nullptr;
+		RenderTarget = nullptr;
+		SolidBrush = nullptr;
+		LinearBrush = nullptr;
+		GradientStopsArray = nullptr;
+		GradientStopCollection = nullptr;
+		TextFormat = nullptr;
 		EventResult = S_OK;
 	}
 
@@ -28,6 +31,9 @@ namespace Graphics {
 		}
 		if (LinearBrush) {
 			LinearBrush->Release();
+		}
+		if (GradientStopCollection) {
+			GradientStopCollection->Release();
 		}
 		if (TextFormat) {
 			TextFormat->Release();
@@ -84,6 +90,28 @@ namespace Graphics {
 	}
 	void GraphicsEngine::ClearScreen(double R, double G, double B) {
 		RenderTarget->Clear(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B)));
+	}
+
+	void GraphicsEngine::SetSolidBrush(double R, double G, double B, double A) {
+		SolidBrush->SetColor(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)));
+	}
+
+	void GraphicsEngine::SetLinearBrush(const std::vector<Graphics::Colour> GradientStops, const double StartX, const double StartY, const double EndX, const double EndY) {
+		if (GradientStops.size() == 0) {
+			throw std::invalid_argument("GraphicsEngine::SetLinearBrush: Empty GradientStops vector entered");
+		}
+		//Potentially throws bad_alloc
+		GradientStopsArray = new D2D1_GRADIENT_STOP[GradientStops.size()];
+		for (int i{ 0 }; i < GradientStops.size(); i++) {
+			GradientStopsArray[i].color = D2D1::ColorF(static_cast<float>(GradientStops[i].R), static_cast<float>(GradientStops[i].G), static_cast<float>(GradientStops[i].B), static_cast<float>(GradientStops[i].A));
+			GradientStopsArray[i].position = static_cast<float>(static_cast<double>(i) / (static_cast<double>(GradientStops.size() - 1)));
+		}
+		EventResult = RenderTarget->CreateGradientStopCollection(GradientStopsArray, GradientStops.size(), &GradientStopCollection);
+		if (EventResult != S_OK) {
+			throw std::invalid_argument("GraphicsEngine::SetLinearBrush: Gradient stop collection generation failure");
+		}
+		EventResult = RenderTarget->CreateLinearGradientBrush(D2D1::LinearGradientBrushProperties(D2D1::Point2F(static_cast<float>(StartX), static_cast<float>(StartY)), D2D1::Point2F(static_cast<float>(EndX), static_cast<float>(EndY))), GradientStopCollection, &LinearBrush);
+		delete[] GradientStopsArray;
 	}
 
 	void GraphicsEngine::DrawEmptyCircle(double X, double Y, double Radius, double R, double G, double B, double A, double Thickness) {

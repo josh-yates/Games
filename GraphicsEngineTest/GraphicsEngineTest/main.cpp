@@ -62,13 +62,25 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 				Renderer->DrawEmptyCircle(100, 50, 20, 4, Graphics::UseLinearBrush);
 				Renderer->SetLinearBrush(MyStops, 120, 20, 180, 80);
 				Renderer->DrawFullCircle(150, 50, 30, Graphics::UseLinearBrush);
-				Renderer->DrawEmptyEllipse(250, 50, 40, 20, 0.5, 0.2, 0.5, 1.0, 2);
-				Renderer->DrawFullEllipse(350, 50, 50, 20, 0.9, 0.9, 0.2, 1.0);
-				Renderer->DrawEmptySquare(450, 30, 40, 0.4, 0.3, 0.2, 1.0, 5);
-				Renderer->DrawFullSquare(550, 30, 40, 0.8, 0.7, 0.3, 1.0);
-				Renderer->DrawEmptyRectangle(650, 30, 50, 20, 0.3, 0.3, 0.5, 1.0, 3);
-				Renderer->DrawFullRectangle(750, 30, 100, 50, 0.9, 0.2, 0.2, 1.0);
-				Renderer->WriteText("abcdefghijklmnopqrstuvwxyz0123456789#'/.,\@:;(){}[]", "comic sans ms", -30, 10, 100, 800, 300, 1.0, 0.1, 1.0, 0.5);
+				MyStops = { Graphics::Colour(0.0, 1.0, 0.0, 1.0), Graphics::Colour(0.0, 0.0, 1.0, 1.0) };
+				Renderer->SetLinearBrush(MyStops, 250, 30, 250, 70);
+				Renderer->DrawEmptyEllipse(250, 50, 40, 20, 6, Graphics::UseLinearBrush);
+				MyStops = { Graphics::Colour(0.0, 1.0, 0.0, 1.0), Graphics::Colour(0.0, 0.0, 1.0, 1.0), Graphics::Colour(1.0,0.0,0.0,1.0) };
+				Renderer->SetLinearBrush(MyStops, 350, 30, 350, 70);
+				Renderer->DrawFullEllipse(350, 50, 50, 20, Graphics::UseLinearBrush);
+				Renderer->SetLinearBrush(MyStops, 450, 50, 490, 50);
+				Renderer->DrawEmptySquare(450, 30, 40, 5, Graphics::UseLinearBrush);
+				MyStops = { Graphics::Colour(0.5, 0.0, 1.0, 1.0), Graphics::Colour(1.0,1.0,1.0,1.0) };
+				Renderer->SetLinearBrush(MyStops, 550, 70, 590, 30);
+				Renderer->DrawFullSquare(550, 30, 40, Graphics::UseLinearBrush);
+				MyStops = { Graphics::Colour(0.0, 1.0, 0.0, 1.0), Graphics::Colour(0.0, 1.0, 0.0, 0.0) };
+				Renderer->SetLinearBrush(MyStops, 650, 30, 700, 50);
+				Renderer->DrawEmptyRectangle(650, 30, 50, 20, 4, Graphics::UseLinearBrush);
+				Renderer->SetLinearBrush(MyStops, 850, 30, 750, 80);
+				Renderer->DrawFullRectangle(750, 30, 100, 50, Graphics::UseLinearBrush);
+				MyStops = { Graphics::Colour(1.0,0.0,0.0,1.0),Graphics::Colour(0.0,0.0,1.0,1.0) };
+				Renderer->SetLinearBrush(MyStops, 10, 120, 1000, 120);
+				Renderer->WriteText("abcdefghijklmnopqrstuvwxyz0123456789#'/.,\@:;(){}[]", "comic sans ms", 30, 10, 300, 1000, 200, Graphics::UseLinearBrush);
 				Renderer->EndDraw();
 			}
 		}

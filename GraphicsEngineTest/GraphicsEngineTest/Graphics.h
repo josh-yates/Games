@@ -51,13 +51,13 @@ namespace Graphics {
 		void ClearScreen(const double R, const double G, const double B);
 		void DrawEmptyCircle(const double X, const double Y, const double Radius, const double Thickness, const BrushFlag BrushToUse);
 		void DrawFullCircle(const double X, const double Y, const double Radius, const BrushFlag BrushToUse);
-		void DrawEmptyEllipse(double X, double Y, double RadiusA, double RadiusB, double R, double G, double B, double A, double Thickness);
-		void DrawFullEllipse(double X, double Y, double RadiusA, double RadiusB, double R, double G, double B, double A);
-		void DrawEmptyRectangle(double X, double Y, double Width, double Height, double R, double G, double B, double A, double Thickness);
-		void DrawFullRectangle(double X, double Y, double Width, double Height, double R, double G, double B, double A);
-		void DrawEmptySquare(double X, double Y, double SideLength, double R, double G, double B, double A, double Thickness);
-		void DrawFullSquare(double X, double Y, double SideLength, double R, double G, double B, double A);
-		void WriteText(std::string TextIn, std::string FontName, double FontSize, double X, double Y, double Width, double Height, double R, double G, double B, double A);
+		void DrawEmptyEllipse(const double X, const double Y, const double RadiusA, const double RadiusB, const double Thickness, const BrushFlag BrushToUse);
+		void DrawFullEllipse(const double X, const double Y, const double RadiusA, const double RadiusB, const BrushFlag BrushToUse);
+		void DrawEmptyRectangle(const double X, const double Y, const double Width, const double Height, const double Thickness, const BrushFlag BrushToUse);
+		void DrawFullRectangle(const double X, const double Y, const double Width, const double Height, const BrushFlag BrushToUse);
+		void DrawEmptySquare(const double X, const double Y, const double SideLength, const double Thickness, const BrushFlag BrushToUse);
+		void DrawFullSquare(const double X, const double Y, const double SideLength, const BrushFlag BrushToUse);
+		void WriteText(const std::string TextIn, const std::string FontName, const double FontSize, const double X, const double Y, const double Width, const double Height, const BrushFlag BrushToUse);
 
 	private:
 		//In shape drawing functions, only have to specify function for drawing the shape

@@ -61,8 +61,10 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 				//Update and render
 				Renderer->BeginDraw();
 				Renderer->ClearScreen(0.1, 0.2, 0.1);
-				Renderer->DrawEmptyCircle(50, 50, 20, 0.0, 0.6, 0.6, 1.0, 4);
 				Renderer->DrawFullCircle(150, 50, 20, 0.3, 0.2, 0.7, 1.0);
+				std::vector<Graphics::Colour> MyStops{ Graphics::Colour(1.0, 1.0, 1.0, 1.0), Graphics::Colour(1.0, 1.0, 1.0, 0.0) };
+				Renderer->SetLinearBrush(MyStops, 80, 50, 110, 50);
+				Renderer->DrawEmptyCircle(100, 50, 20, 4, Graphics::UseLinearBrush);
 				Renderer->DrawEmptyEllipse(250, 50, 40, 20, 0.5, 0.2, 0.5, 1.0, 2);
 				Renderer->DrawFullEllipse(350, 50, 50, 20, 0.9, 0.9, 0.2, 1.0);
 				Renderer->DrawEmptySquare(450, 30, 40, 0.4, 0.3, 0.2, 1.0, 5);

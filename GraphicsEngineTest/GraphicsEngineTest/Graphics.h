@@ -20,11 +20,14 @@ namespace Graphics {
 		double A;
 	};
 
+	const enum BrushFlag { UseSolidBrush, UseLinearBrush };
+
 	class GraphicsEngine {
 	private:
 		ID2D1Factory * Factory;					//Generates graphics resources
 		IDWriteFactory* TextFactory;			//Generates text resources
 		ID2D1HwndRenderTarget* RenderTarget;	//Where to render resources to
+		ID2D1Brush* BrushSelection;				//Set to linear, solid or radial brush
 		ID2D1SolidColorBrush* SolidBrush;		//Brush for drawing shapes with solid color
 		ID2D1LinearGradientBrush* LinearBrush;	//Brush for drawing shapes with gradient color
 		D2D1_GRADIENT_STOP* GradientStopsArray;	//Pointer for dynamic allocation of gradient stop array
@@ -33,7 +36,8 @@ namespace Graphics {
 		HRESULT EventResult;
 		std::wstring StringToWstring(const std::string StringIn);	//String to wstring converter
 	public:
-		//TODO const all those inputs... :) (or change them all to take a Graphics::Colour
+		//TODO add flags for whether to use solid brush or linear brush and remove colour inputs, ie. you set the brush then draw a shape and use brush flag to specify which brush to use
+		//TODO also add a starting linear gradient brush in init. Potentially move init to constructor for safety
 		GraphicsEngine();
 		~GraphicsEngine();
 		bool Init(HWND hWindow);				//Initialise direct2d
@@ -42,7 +46,7 @@ namespace Graphics {
 		void SetSolidBrush(double R, double G, double B, double A);
 		void SetLinearBrush(const std::vector<Graphics::Colour> GradientStops, const double StartX, const double StartY, const double EndX, const double EndY);
 		void ClearScreen(double R, double G, double B);
-		void DrawEmptyCircle(double X, double Y, double Radius, double R, double G, double B, double A, double Thickness);
+		void DrawEmptyCircle(const double X, const double Y, const double Radius, const double Thickness, const BrushFlag BrushToUse);
 		void DrawFullCircle(double X, double Y, double Radius, double R, double G, double B, double A);
 		void DrawEmptyEllipse(double X, double Y, double RadiusA, double RadiusB, double R, double G, double B, double A, double Thickness);
 		void DrawFullEllipse(double X, double Y, double RadiusA, double RadiusB, double R, double G, double B, double A);

@@ -7,6 +7,7 @@ namespace Graphics {
 		Factory = nullptr;
 		TextFactory = nullptr;
 		RenderTarget = nullptr;
+		BrushSelection = nullptr;
 		SolidBrush = nullptr;
 		LinearBrush = nullptr;
 		GradientStopsArray = nullptr;
@@ -31,6 +32,9 @@ namespace Graphics {
 		}
 		if (LinearBrush) {
 			LinearBrush->Release();
+		}
+		if (BrushSelection) {
+			BrushSelection->Release();
 		}
 		if (GradientStopCollection) {
 			GradientStopCollection->Release();
@@ -107,16 +111,37 @@ namespace Graphics {
 			GradientStopsArray[i].position = static_cast<float>(static_cast<double>(i) / (static_cast<double>(GradientStops.size() - 1)));
 		}
 		EventResult = RenderTarget->CreateGradientStopCollection(GradientStopsArray, GradientStops.size(), &GradientStopCollection);
+		delete[] GradientStopsArray;
+		GradientStopsArray = nullptr;
 		if (EventResult != S_OK) {
 			throw std::invalid_argument("GraphicsEngine::SetLinearBrush: Gradient stop collection generation failure");
 		}
 		EventResult = RenderTarget->CreateLinearGradientBrush(D2D1::LinearGradientBrushProperties(D2D1::Point2F(static_cast<float>(StartX), static_cast<float>(StartY)), D2D1::Point2F(static_cast<float>(EndX), static_cast<float>(EndY))), GradientStopCollection, &LinearBrush);
-		delete[] GradientStopsArray;
+		GradientStopCollection->Release();
+		GradientStopCollection = nullptr;
 	}
 
-	void GraphicsEngine::DrawEmptyCircle(double X, double Y, double Radius, double R, double G, double B, double A, double Thickness) {
-		SolidBrush->SetColor(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)));
-		RenderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(Radius), static_cast<float>(Radius)), SolidBrush, static_cast<float>(abs(Thickness)));
+	void GraphicsEngine::DrawEmptyCircle(const double X, const double Y, const double Radius, const double Thickness, const BrushFlag BrushToUse) {
+		switch (BrushToUse) {
+		case UseSolidBrush:
+			BrushSelection = SolidBrush;
+			break;
+		case UseLinearBrush:
+			BrushSelection = LinearBrush;
+			break;
+		default:
+			throw std::invalid_argument("GraphicsEngine: Invalid brush flag selected");
+			break;
+		}
+		RenderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(Radius), static_cast<float>(Radius)), BrushSelection, static_cast<float>(abs(Thickness)));
+		//Remove access of brush selection to the brush it pointed to
+		BrushSelection = nullptr;
+		//if any repeatedly created brushes were used (ie linear and radial), delete them
+		//Solid brush is created once and repeatedly used so do not release it here
+		if (LinearBrush) {
+			LinearBrush->Release();
+			LinearBrush = nullptr;
+		}
 	}
 
 	void GraphicsEngine::DrawFullCircle(double X, double Y, double Radius, double R, double G, double B, double A) {

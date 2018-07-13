@@ -57,6 +57,7 @@ namespace Graphics {
 		void DrawFullRectangle(const double X, const double Y, const double Width, const double Height, const BrushFlag BrushToUse);
 		void DrawEmptySquare(const double X, const double Y, const double SideLength, const double Thickness, const BrushFlag BrushToUse);
 		void DrawFullSquare(const double X, const double Y, const double SideLength, const BrushFlag BrushToUse);
+		void DrawStraightLine(const double StartX, const double StartY, const double EndX, const double EndY, const double Thickness, const BrushFlag BrushToUse);
 		void WriteText(const std::string TextIn, const std::string FontName, const double FontSize, const double X, const double Y, const double Width, const double Height, const BrushFlag BrushToUse);
 
 	private:

@@ -86,11 +86,15 @@ LRESULT __stdcall WindowProc(HWND hWindow, UINT Message, WPARAM wP, LPARAM lP) {
 			Renderer->DrawFullRectangle(0, 0, ClientWidth, ClientHeight, Graphics::UseLinearBrush);
 			Renderer->SetSolidBrush(0.0, 0.0, 0.0, 1.0);
 			Renderer->WriteText("Example Program", "Gill sans nova", 70, 250, 50, 600, 100, Graphics::UseSolidBrush);
-			Stops = { Graphics::Colour(0.5,0.5,0.5,1.0),Graphics::Colour(0.7,0.7,0.7,1.0), Graphics::Colour(0.5,0.5,0.5,1.0) };
+			/*Stops = { Graphics::Colour(0.5,0.5,0.5,1.0),Graphics::Colour(0.7,0.7,0.7,1.0), Graphics::Colour(0.5,0.5,0.5,1.0) };
 			Renderer->SetLinearBrush(Stops, (ClientWidth - 300) / 2, 400, ((ClientWidth - 300) / 2) + 300, 400);
-			Renderer->DrawFullRectangle((ClientWidth - 300) / 2, 400, 300, 80, Graphics::UseLinearBrush);
+			Renderer->DrawFullRectangle((ClientWidth - 300) / 2, 400, 300, 80, Graphics::UseLinearBrush);*/
+			Renderer->SetSolidBrush(0.6, 0.6, 0.6, 1.0);
+			Renderer->DrawFullRectangle((ClientWidth - 300) / 2, 400, 300, 80, Graphics::UseSolidBrush);
 			Renderer->SetSolidBrush(0.0, 0.0, 0.0, 0.5);
 			Renderer->DrawEmptyRectangle((ClientWidth - 300) / 2, 400, 300, 80, 4, Graphics::UseSolidBrush);
+			Renderer->SetSolidBrush(0.0, 0.0, 0.0, 0.5);
+			Renderer->DrawStraightLine((ClientWidth - 300) / 2, 500, ((ClientWidth - 300) / 2) + 300, 500, 10, Graphics::UseSolidBrush);
 			Renderer->SetSolidBrush(0.0, 0.0, 0.0, 1.0);
 			Renderer->WriteText("Example Button", "Arial Black", 25, ((ClientWidth - 300) / 2) + 55, 420, 200, 30, Graphics::UseSolidBrush);
 			//Draw background

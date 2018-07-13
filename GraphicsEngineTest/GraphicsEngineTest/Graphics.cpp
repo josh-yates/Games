@@ -156,6 +156,10 @@ namespace Graphics {
 		DrawShapeUsingBrush(BrushToUse, [this, X, Y, SideLength]()->void {RenderTarget->FillRectangle(D2D1::Rect(static_cast<float>(X), static_cast<float>(Y), static_cast<float>(X + SideLength), static_cast<float>(Y + SideLength)), BrushSelection); });
 	}
 
+	void GraphicsEngine::DrawStraightLine(const double StartX, const double StartY, const double EndX, const double EndY, const double Thickness, const BrushFlag BrushToUse) {
+		DrawShapeUsingBrush(BrushToUse, [this, StartX, StartY, EndX, EndY, Thickness]()->void {RenderTarget->DrawLine(D2D1::Point2F(static_cast<float>(StartX), static_cast<float>(StartY)), D2D1::Point2F(static_cast<float>(EndX), static_cast<float>(EndY)), BrushSelection,static_cast<float>(Thickness)); });
+	}
+
 	void GraphicsEngine::WriteText(const std::string TextIn, const std::string FontName, const double FontSize, const double X, const double Y, const double Width, const double Height, const BrushFlag BrushToUse) {
 		if (TextFormat) {
 			TextFormat->Release();

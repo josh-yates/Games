@@ -48,41 +48,9 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 
 		//Message Loop
 		MSG Message{ 0 };
-		while (Message.message != WM_QUIT) {
-			if (PeekMessage(&Message, NULL, 0, 0, PM_REMOVE)) {
-				TranslateMessage(&Message);
-				DispatchMessage(&Message);
-			}
-			else {
-				//Update and render
-				Renderer->BeginDraw();
-				Renderer->ClearScreen(0.1, 0.2, 0.1);
-				std::vector<Graphics::Colour> MyStops{ Graphics::Colour(1.0, 1.0, 1.0, 1.0), Graphics::Colour(1.0, 1.0, 1.0, 0.0) };
-				Renderer->SetLinearBrush(MyStops, 80, 50, 110, 50);
-				Renderer->DrawEmptyCircle(100, 50, 20, 4, Graphics::UseLinearBrush);
-				Renderer->SetLinearBrush(MyStops, 120, 20, 180, 80);
-				Renderer->DrawFullCircle(150, 50, 30, Graphics::UseLinearBrush);
-				MyStops = { Graphics::Colour(0.0, 1.0, 0.0, 1.0), Graphics::Colour(0.0, 0.0, 1.0, 1.0) };
-				Renderer->SetLinearBrush(MyStops, 250, 30, 250, 70);
-				Renderer->DrawEmptyEllipse(250, 50, 40, 20, 6, Graphics::UseLinearBrush);
-				MyStops = { Graphics::Colour(0.0, 1.0, 0.0, 1.0), Graphics::Colour(0.0, 0.0, 1.0, 1.0), Graphics::Colour(1.0,0.0,0.0,1.0) };
-				Renderer->SetLinearBrush(MyStops, 350, 30, 350, 70);
-				Renderer->DrawFullEllipse(350, 50, 50, 20, Graphics::UseLinearBrush);
-				Renderer->SetLinearBrush(MyStops, 450, 50, 490, 50);
-				Renderer->DrawEmptySquare(450, 30, 40, 5, Graphics::UseLinearBrush);
-				MyStops = { Graphics::Colour(0.5, 0.0, 1.0, 1.0), Graphics::Colour(1.0,1.0,1.0,1.0) };
-				Renderer->SetLinearBrush(MyStops, 550, 70, 590, 30);
-				Renderer->DrawFullSquare(550, 30, 40, Graphics::UseLinearBrush);
-				MyStops = { Graphics::Colour(0.0, 1.0, 0.0, 1.0), Graphics::Colour(0.0, 1.0, 0.0, 0.0) };
-				Renderer->SetLinearBrush(MyStops, 650, 30, 700, 50);
-				Renderer->DrawEmptyRectangle(650, 30, 50, 20, 4, Graphics::UseLinearBrush);
-				Renderer->SetLinearBrush(MyStops, 850, 30, 750, 80);
-				Renderer->DrawFullRectangle(750, 30, 100, 50, Graphics::UseLinearBrush);
-				MyStops = { Graphics::Colour(1.0,0.0,0.0,1.0),Graphics::Colour(0.0,0.0,1.0,1.0) };
-				Renderer->SetLinearBrush(MyStops, 10, 120, 1000, 120);
-				Renderer->WriteText("abcdefghijklmnopqrstuvwxyz0123456789#'/.,\@:;(){}[]", "comic sans ms", 30, 10, 300, 1000, 200, Graphics::UseLinearBrush);
-				Renderer->EndDraw();
-			}
+		while (GetMessage(&Message, NULL, NULL, NULL)) {
+			TranslateMessage(&Message);
+			DispatchMessage(&Message);
 		}
 		//Clean up memory
 		delete Renderer;
@@ -102,13 +70,54 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmd
 }
 
 LRESULT __stdcall WindowProc(HWND hWindow, UINT Message, WPARAM wP, LPARAM lP) {
-	switch (Message) {
-	case WM_DESTROY:
+	try {
+		switch (Message) {
+		case WM_PAINT: {
+			//Paint window
+			PAINTSTRUCT ps;
+			HDC hdc;
+			hdc = BeginPaint(hWindow, &ps);
+			EndPaint(hWindow, &ps);
+			//Paint app
+			Renderer->BeginDraw();
+			Renderer->ClearScreen(0.0, 0.0, 0.0);
+			std::vector<Graphics::Colour> Stops{ Graphics::Colour(0.62,0.42,0.52,1.0),Graphics::Colour(0.95,0.95,0.95,1.0) };
+			Renderer->SetLinearBrush(Stops, ClientWidth / 2, 0, ClientWidth / 2, ClientHeight);
+			Renderer->DrawFullRectangle(0, 0, ClientWidth, ClientHeight, Graphics::UseLinearBrush);
+			Renderer->SetSolidBrush(0.0, 0.0, 0.0, 1.0);
+			Renderer->WriteText("Example Program", "Gill sans nova", 70, 250, 50, 600, 100, Graphics::UseSolidBrush);
+			Stops = { Graphics::Colour(0.5,0.5,0.5,1.0),Graphics::Colour(0.7,0.7,0.7,1.0), Graphics::Colour(0.5,0.5,0.5,1.0) };
+			Renderer->SetLinearBrush(Stops, (ClientWidth - 300) / 2, 400, ((ClientWidth - 300) / 2) + 300, 400);
+			Renderer->DrawFullRectangle((ClientWidth - 300) / 2, 400, 300, 80, Graphics::UseLinearBrush);
+			Renderer->SetSolidBrush(0.0, 0.0, 0.0, 0.5);
+			Renderer->DrawEmptyRectangle((ClientWidth - 300) / 2, 400, 300, 80, 4, Graphics::UseSolidBrush);
+			Renderer->SetSolidBrush(0.0, 0.0, 0.0, 1.0);
+			Renderer->WriteText("Example Button", "Arial Black", 25, ((ClientWidth - 300) / 2) + 55, 420, 200, 30, Graphics::UseSolidBrush);
+			//Draw background
+			Renderer->EndDraw();
+			break;
+		}
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			return 0;
+			break;
+		default:
+			return DefWindowProcW(hWindow, Message, wP, lP);
+			break;
+		}
+	}
+	catch (std::invalid_argument& inval_arg) {
+		//copy string to wstring
+		std::string TempString(inval_arg.what());
+		std::wstring errmsg(TempString.length(), L' ');
+		std::copy(TempString.begin(), TempString.end(), errmsg.begin());
+		MessageBox(NULL, errmsg.c_str(), L"Programming error", MB_ICONERROR);
 		PostQuitMessage(0);
 		return 0;
-		break;
-	default:
-		return DefWindowProcW(hWindow, Message, wP, lP);
-		break;
+	}
+	catch (...) {
+		MessageBox(NULL, L"Unknown error", L"Programming error", MB_ICONERROR);
+		PostQuitMessage(0);
+		return 0;
 	}
 }

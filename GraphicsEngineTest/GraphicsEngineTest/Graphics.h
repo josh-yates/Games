@@ -3,13 +3,19 @@
 
 #include <Windows.h>
 #include <stdexcept>
+#include <memory>
 #include <vector>
 #include <d2d1.h>
 #include <dwrite.h>
+#include <functional>
 #include <string>
 
 //LINEAR OR SOLID: Make separate "SetSolidBrush" and "SetLinearBrush" functions that can then be used to edit brushes
 //Also use flags at function input specifying whether to use linear or solid brush - could use enum or #define's
+
+//TODO List:
+//-Smart pointers
+//-Either add bools for IsDrawingStarted(set when begin draw called and unset when end draw called) or move begin and end draw into shape drawing functions
 
 namespace Graphics {
 	struct Colour {
@@ -20,11 +26,11 @@ namespace Graphics {
 		double A;
 	};
 
-	const enum BrushFlag { UseSolidBrush, UseLinearBrush };
+	const enum BrushFlag { UseSolidBrush, UseLinearBrush };	//Tell shape drawing functions what brush to use
 
 	class GraphicsEngine {
 	private:
-		ID2D1Factory * Factory;					//Generates graphics resources
+		ID2D1Factory* Factory;					//Generates graphics resources
 		IDWriteFactory* TextFactory;			//Generates text resources
 		ID2D1HwndRenderTarget* RenderTarget;	//Where to render resources to
 		ID2D1Brush* BrushSelection;				//Set to linear, solid or radial brush
@@ -36,18 +42,15 @@ namespace Graphics {
 		HRESULT EventResult;
 		std::wstring StringToWstring(const std::string StringIn);	//String to wstring converter
 	public:
-		//TODO add flags for whether to use solid brush or linear brush and remove colour inputs, ie. you set the brush then draw a shape and use brush flag to specify which brush to use
-		//TODO also add a starting linear gradient brush in init. Potentially move init to constructor for safety
-		GraphicsEngine();
+		GraphicsEngine(HWND hWindow);
 		~GraphicsEngine();
-		bool Init(HWND hWindow);				//Initialise direct2d
 		void BeginDraw();						//Signal start of graphics drawing
 		void EndDraw();							//Signal end of graphics drawing
-		void SetSolidBrush(double R, double G, double B, double A);
+		void SetSolidBrush(const double R, const double G, const double B, const double A);
 		void SetLinearBrush(const std::vector<Graphics::Colour> GradientStops, const double StartX, const double StartY, const double EndX, const double EndY);
-		void ClearScreen(double R, double G, double B);
+		void ClearScreen(const double R, const double G, const double B);
 		void DrawEmptyCircle(const double X, const double Y, const double Radius, const double Thickness, const BrushFlag BrushToUse);
-		void DrawFullCircle(double X, double Y, double Radius, double R, double G, double B, double A);
+		void DrawFullCircle(const double X, const double Y, const double Radius, const BrushFlag BrushToUse);
 		void DrawEmptyEllipse(double X, double Y, double RadiusA, double RadiusB, double R, double G, double B, double A, double Thickness);
 		void DrawFullEllipse(double X, double Y, double RadiusA, double RadiusB, double R, double G, double B, double A);
 		void DrawEmptyRectangle(double X, double Y, double Width, double Height, double R, double G, double B, double A, double Thickness);
@@ -55,6 +58,37 @@ namespace Graphics {
 		void DrawEmptySquare(double X, double Y, double SideLength, double R, double G, double B, double A, double Thickness);
 		void DrawFullSquare(double X, double Y, double SideLength, double R, double G, double B, double A);
 		void WriteText(std::string TextIn, std::string FontName, double FontSize, double X, double Y, double Width, double Height, double R, double G, double B, double A);
+
+	private:
+		//In shape drawing functions, only have to specify function for drawing the shape
+		template<typename Lambda> void DrawShapeUsingBrush(BrushFlag BrushToUse, Lambda&& DrawingFunction) {
+			switch (BrushToUse) {
+			case UseSolidBrush:
+				BrushSelection = SolidBrush;
+				break;
+			case UseLinearBrush:
+				//if brush is nullptr, throw an error
+				if (!LinearBrush) {
+					throw std::invalid_argument("GraphicsEngine: Linear brush not set before use");
+				}
+				BrushSelection = LinearBrush;
+				break;
+			default:
+				throw std::invalid_argument("GraphicsEngine: Invalid brush flag selected");
+				break;
+			}
+
+			DrawingFunction();
+
+			//Remove access of brush selection to the brush it pointed to
+			BrushSelection = nullptr;
+			//if any repeatedly created brushes were used (ie linear and radial), delete them
+			//Solid brush is created once and repeatedly used so do not release it here
+			if (LinearBrush) {
+				LinearBrush->Release();
+				LinearBrush = nullptr;
+			}
+		}
 	};
 }
 

@@ -3,7 +3,7 @@
 namespace Graphics {
 	Colour::Colour(const double Rin, const double Gin, const double Bin, const double Ain) :R(Rin), G(Gin), B(Bin), A(Ain) {}
 
-	GraphicsEngine::GraphicsEngine() {
+	GraphicsEngine::GraphicsEngine(HWND hWindow) {
 		Factory = nullptr;
 		TextFactory = nullptr;
 		RenderTarget = nullptr;
@@ -14,6 +14,41 @@ namespace Graphics {
 		GradientStopCollection = nullptr;
 		TextFormat = nullptr;
 		EventResult = S_OK;
+
+		//Initialise resources
+
+		//Try initialising the factory
+		EventResult = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &Factory);
+		if (EventResult != S_OK) {
+			throw std::invalid_argument("GraphicsEngine constructor: Unable to create factory");
+		}
+
+		//Read the size of the window
+		RECT WindowRect;
+		GetClientRect(hWindow, &WindowRect);
+
+		//Try initialising the rendertarget
+		EventResult = Factory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(),
+			D2D1::HwndRenderTargetProperties(hWindow, D2D1::SizeU(WindowRect.right, WindowRect.bottom)),
+			&RenderTarget);
+
+		if (EventResult != S_OK) {
+			throw std::invalid_argument("GraphicsEngine constructor: Unable to initialise render target");
+		}
+
+		//Globally create the solid brush for repeated use
+		EventResult = RenderTarget->CreateSolidColorBrush(D2D1::ColorF(static_cast<float>(0.0), static_cast<float>(0.0), static_cast<float>(0.0), static_cast<float>(1.0)), &SolidBrush);
+
+		if (EventResult != S_OK) {
+			throw std::invalid_argument("GraphicsEngine constructor: Unable to create solid brush");
+		}
+
+		//Create the text factory
+		EventResult = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&TextFactory));
+
+		if (EventResult != S_OK) {
+			throw std::invalid_argument("GraphicsEngine constructor: Unable to create text factory");
+		}
 	}
 
 	GraphicsEngine::~GraphicsEngine() {
@@ -49,60 +84,28 @@ namespace Graphics {
 		std::copy(StringIn.begin(), StringIn.end(), Converted.begin());
 		return Converted;
 	}
-
-	bool GraphicsEngine::Init(HWND hWindow) {
-		//Try initialising the factory
-		EventResult = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &Factory);
-		if (EventResult != S_OK) {
-			return false;
-		}
-
-		//Read the size of the window
-		RECT WindowRect;
-		GetClientRect(hWindow, &WindowRect);
-
-		//Try initialising the rendertarget
-		EventResult = Factory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(),
-			D2D1::HwndRenderTargetProperties(hWindow, D2D1::SizeU(WindowRect.right, WindowRect.bottom)),
-			&RenderTarget);
-
-		if (EventResult != S_OK) {
-			return false;
-		}
-
-		//Globally create the solid brush for repeated use
-		EventResult = RenderTarget->CreateSolidColorBrush(D2D1::ColorF(static_cast<float>(0.0), static_cast<float>(0.0), static_cast<float>(0.0), static_cast<float>(1.0)), &SolidBrush);
-
-		if (EventResult != S_OK) {
-			return false;
-		}
-
-		//Create the text factory
-		EventResult = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&TextFactory));
-
-		if (EventResult != S_OK) {
-			return false;
-		}
-
-		return true;
-	}
 	void GraphicsEngine::BeginDraw() {
 		RenderTarget->BeginDraw();
 	}
 	void GraphicsEngine::EndDraw() {
 		RenderTarget->EndDraw();
 	}
-	void GraphicsEngine::ClearScreen(double R, double G, double B) {
+	void GraphicsEngine::ClearScreen(const double R, const double G, const double B) {
 		RenderTarget->Clear(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B)));
 	}
 
-	void GraphicsEngine::SetSolidBrush(double R, double G, double B, double A) {
+	void GraphicsEngine::SetSolidBrush(const double R, const double G, const double B, const double A) {
 		SolidBrush->SetColor(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)));
 	}
 
 	void GraphicsEngine::SetLinearBrush(const std::vector<Graphics::Colour> GradientStops, const double StartX, const double StartY, const double EndX, const double EndY) {
 		if (GradientStops.size() == 0) {
 			throw std::invalid_argument("GraphicsEngine::SetLinearBrush: Empty GradientStops vector entered");
+		}
+		//check if linear brush not cleared
+		if (LinearBrush) {
+			LinearBrush->Release();
+			LinearBrush = nullptr;
 		}
 		//Potentially throws bad_alloc
 		GradientStopsArray = new D2D1_GRADIENT_STOP[GradientStops.size()];
@@ -122,31 +125,11 @@ namespace Graphics {
 	}
 
 	void GraphicsEngine::DrawEmptyCircle(const double X, const double Y, const double Radius, const double Thickness, const BrushFlag BrushToUse) {
-		switch (BrushToUse) {
-		case UseSolidBrush:
-			BrushSelection = SolidBrush;
-			break;
-		case UseLinearBrush:
-			BrushSelection = LinearBrush;
-			break;
-		default:
-			throw std::invalid_argument("GraphicsEngine: Invalid brush flag selected");
-			break;
-		}
-		RenderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(Radius), static_cast<float>(Radius)), BrushSelection, static_cast<float>(abs(Thickness)));
-		//Remove access of brush selection to the brush it pointed to
-		BrushSelection = nullptr;
-		//if any repeatedly created brushes were used (ie linear and radial), delete them
-		//Solid brush is created once and repeatedly used so do not release it here
-		if (LinearBrush) {
-			LinearBrush->Release();
-			LinearBrush = nullptr;
-		}
+		DrawShapeUsingBrush(BrushToUse, [this, X, Y, Radius, Thickness]()-> void {RenderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(Radius), static_cast<float>(Radius)), BrushSelection, static_cast<float>(abs(Thickness))); });
 	}
 
-	void GraphicsEngine::DrawFullCircle(double X, double Y, double Radius, double R, double G, double B, double A) {
-		SolidBrush->SetColor(D2D1::ColorF(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B), static_cast<float>(A)));
-		RenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(Radius), static_cast<float>(Radius)), SolidBrush);
+	void GraphicsEngine::DrawFullCircle(const double X, const double Y, const double Radius, const BrushFlag BrushToUse) {
+		DrawShapeUsingBrush(BrushToUse, [this, X, Y, Radius]()->void {RenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(static_cast<float>(X), static_cast<float>(Y)), static_cast<float>(Radius), static_cast<float>(Radius)), BrushSelection); });
 	}
 
 	void GraphicsEngine::DrawEmptyEllipse(double X, double Y, double RadiusA, double RadiusB, double R, double G, double B, double A, double Thickness) {

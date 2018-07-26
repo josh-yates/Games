@@ -143,7 +143,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameBoard.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OthelloNS.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="array2D.h" />
+    <ClInclude Include="GameBoard.h" />
+    <ClInclude Include="OthelloNS.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
